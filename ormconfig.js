@@ -8,9 +8,9 @@ module.exports = {
     username: DB_USERNAME,
     password: DB_PASSWORD,
     database: DB_DATABASE,
-    synchronize: true,
     logging: false,
     entities: ['src/entities/**/*.ts'],
     migrations: ['src/migration/**/*.ts'],
     subscribers: ['src/subscriber/**/*.ts'],
+    cli: { migrationsDir: 'src/migration' },
 };

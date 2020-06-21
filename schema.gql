@@ -19,6 +19,32 @@ type User {
   email: String!
   firstName: String
   lastName: String
+  garments: [Garment!]!
+}
+
+type Garment {
+  id: ID!
+  brand: String!
+  lastName: String
+  owner: User!
+  category: GarmentCategory!
+  subCategory: GarmentSubCategory!
+}
+
+type GarmentCategory {
+  id: ID!
+  slug: String!
+  name: String!
+  subCategories: [GarmentSubCategory!]!
+  garments: [Garment!]!
+}
+
+type GarmentSubCategory {
+  id: ID!
+  slug: String!
+  name: String!
+  parentCategory: GarmentCategory!
+  garments: [Garment!]!
 }
 
 type DuplicateUserError {
@@ -47,7 +73,12 @@ input CreateUserInput {
   lastName: String
 }
 
-union LoginUserResult = User | UserNotFoundError | FallBackServerError
+union LoginUserResult = UserAndToken | UserNotFoundError | FallBackServerError
+
+type UserAndToken {
+  user: User!
+  token: String!
+}
 
 type UserNotFoundError {
   responseType: String!

@@ -1,4 +1,7 @@
 import { Resolver, Mutation, Arg, Query } from 'type-graphql';
+import { sign } from 'jsonwebtoken';
+import { JWT_SECRET } from '../../config';
+
 import { User } from '../entities/User';
 import { CreateUserInput } from '../inputs/CreateUserInput';
 import { InjectRepository } from 'typeorm-typedi-extensions';
@@ -37,7 +40,9 @@ export class UserResolver {
     async loginUser(@Arg('email') email: string, @Arg('password') password: string): Promise<typeof LoginUserResult> {
         const user = await this.userRepository.findOne({ email, password: encrypt(password) });
         if (user) {
-            return user;
+            const { email, id } = user;
+            const token = sign({ email, sub: id }, JWT_SECRET);
+            return { user, token };
         }
         return new UserNotFoundError();
     }

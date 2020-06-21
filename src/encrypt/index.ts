@@ -1,7 +1,6 @@
 import { createCipheriv, createDecipheriv } from 'crypto';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { ENCRYPTION_KEY, ENCRYPTION_IV } = require('../../config');
+import { ENCRYPTION_KEY, ENCRYPTION_IV } from '../../config';
 
 const algorithm = 'aes-256-cbc';
 let key = Buffer.alloc(32);

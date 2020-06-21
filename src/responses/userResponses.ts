@@ -5,7 +5,7 @@ import { BaseError, FallBackServerError, ErrorSource } from './errorResponses';
 @ObjectType()
 export class UserNotFoundError implements BaseError {
     @Field(() => String)
-    readonly responseType = 'UserNotFound';
+    readonly responseType = 'UserNotFoundError';
 
     @Field(() => ErrorSource)
     readonly type: ErrorSource = ErrorSource.ClientError;
@@ -26,6 +26,15 @@ export class DuplicateUserError implements BaseError {
     readonly reason = 'User with that email already exists';
 }
 
+@ObjectType()
+export class UserAndToken {
+    @Field(() => User)
+    user: User;
+
+    @Field(() => String)
+    token: string;
+}
+
 export const CreateUserResult = createUnionType({
     name: 'CreateUserResult',
     types: () => [User, DuplicateUserError, FallBackServerError] as const,
@@ -39,10 +48,10 @@ export const CreateUserResult = createUnionType({
 
 export const LoginUserResult = createUnionType({
     name: 'LoginUserResult',
-    types: () => [User, UserNotFoundError, FallBackServerError] as const,
+    types: () => [UserAndToken, UserNotFoundError, FallBackServerError] as const,
     resolveType: (value) => {
-        if ('id' in value) {
-            return 'User';
+        if ('user' in value) {
+            return UserAndToken;
         }
         return value.responseType;
     },
