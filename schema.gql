@@ -8,8 +8,11 @@ type Query {
 }
 
 type Mutation {
-  createUser(input: CreateUserInput!): User!
+  createUser(input: CreateUserInput!): CreateUserResult!
+  loginUser(password: String!, email: String!): LoginUserResult!
 }
+
+union CreateUserResult = User | DuplicateUserError | FallBackServerError
 
 type User {
   id: ID!
@@ -18,9 +21,36 @@ type User {
   lastName: String
 }
 
+type DuplicateUserError {
+  responseType: String!
+  type: ErrorSource!
+  reason: String!
+}
+
+# Either client or server
+enum ErrorSource {
+  ServerError
+  ClientError
+}
+
+type FallBackServerError {
+  responseType: String!
+  type: String!
+  reason: String!
+  message: String!
+}
+
 input CreateUserInput {
   email: String!
   password: String!
   firstName: String
   lastName: String
+}
+
+union LoginUserResult = User | UserNotFoundError | FallBackServerError
+
+type UserNotFoundError {
+  responseType: String!
+  type: ErrorSource!
+  reason: String!
 }
