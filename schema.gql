@@ -8,11 +8,23 @@ type Query {
 }
 
 type Mutation {
+  createGarment(input: CreateGarmentInput!): CreateGarmentResult!
   createUser(input: CreateUserInput!): CreateUserResult!
   loginUser(password: String!, email: String!): LoginUserResult!
 }
 
-union CreateUserResult = User | DuplicateUserError | FallBackServerError
+union CreateGarmentResult = Garment | InvalidSubcategoryError | InvalidBrandError | InvalidOwnerError | UnauthorizedError | FallBackServerError
+
+type Garment {
+  id: ID!
+  title: String!
+  description: String!
+  owner: User!
+  brand: Brand!
+  category: GarmentCategory!
+  subCategory: GarmentSubCategory!
+  images: [GarmentImage!]!
+}
 
 type User {
   id: ID!
@@ -22,13 +34,11 @@ type User {
   garments: [Garment!]!
 }
 
-type Garment {
+type Brand {
   id: ID!
-  brand: String!
-  lastName: String
-  owner: User!
-  category: GarmentCategory!
-  subCategory: GarmentSubCategory!
+  slug: String!
+  name: String!
+  garments: [Garment!]!
 }
 
 type GarmentCategory {
@@ -47,7 +57,13 @@ type GarmentSubCategory {
   garments: [Garment!]!
 }
 
-type DuplicateUserError {
+type GarmentImage {
+  id: ID!
+  imageUrl: String!
+  garment: Garment!
+}
+
+type InvalidSubcategoryError {
   responseType: String!
   type: ErrorSource!
   reason: String!
@@ -59,11 +75,47 @@ enum ErrorSource {
   ClientError
 }
 
+type InvalidBrandError {
+  responseType: String!
+  type: ErrorSource!
+  reason: String!
+}
+
+type InvalidOwnerError {
+  responseType: String!
+  type: ErrorSource!
+  reason: String!
+}
+
+type UnauthorizedError {
+  responseType: String!
+  type: String!
+  reason: String!
+  message: String!
+}
+
 type FallBackServerError {
   responseType: String!
   type: String!
   reason: String!
   message: String!
+}
+
+input CreateGarmentInput {
+  ownerId: String!
+  title: String!
+  description: String!
+  brandId: String!
+  subCategoryId: String!
+  imageUrls: [String!]
+}
+
+union CreateUserResult = User | DuplicateUserError | FallBackServerError
+
+type DuplicateUserError {
+  responseType: String!
+  type: ErrorSource!
+  reason: String!
 }
 
 input CreateUserInput {

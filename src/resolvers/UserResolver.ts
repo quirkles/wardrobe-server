@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Arg, Query } from 'type-graphql';
+import {Resolver, Mutation, Arg, Query, Authorized} from 'type-graphql';
 import { sign } from 'jsonwebtoken';
 import { JWT_SECRET } from '../../config';
 
@@ -24,7 +24,7 @@ export class UserResolver {
     @Mutation(() => CreateUserResult)
     async createUser(@Arg('input') input: CreateUserInput): Promise<typeof CreateUserResult> {
         try {
-            const existingUser = this.userRepository.findOne({ email: input.email });
+            const existingUser = await this.userRepository.findOne({ email: input.email });
             if (existingUser) {
                 return new DuplicateUserError();
             }

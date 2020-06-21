@@ -1,6 +1,6 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class SeedCategoriesAndSubcategories1592753593805 implements MigrationInterface {
+export class SeedCategoriesAndSubcategories1592771233735 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(
@@ -121,6 +121,5 @@ export class SeedCategoriesAndSubcategories1592753593805 implements MigrationInt
         await queryRunner.query(`TRUNCATE TABLE garment_sub_category CASCADE`);
         await queryRunner.query(`TRUNCATE TABLE garment_category CASCADE`);
     }
-
 
 }

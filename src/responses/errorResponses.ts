@@ -72,3 +72,23 @@ export class FallBackServerError implements BaseError {
         this.message = message || this.message;
     }
 }
+
+@ObjectType()
+export class UnauthorizedError implements BaseError {
+    @Field()
+    readonly responseType: string = 'UnauthorizedError';
+
+    @Field()
+    readonly type: ErrorSource = ErrorSource.ClientError;
+
+    @Field()
+    readonly reason: string = 'You are not authorized to perform this action';
+
+    @Field()
+    readonly message: string = 'Could not complete action';
+
+    constructor({ reason, message }: ErrorProps) {
+        this.reason = reason || this.reason;
+        this.message = message || this.message;
+    }
+}
