@@ -11,6 +11,8 @@ import { JWT_SECRET } from '../config';
 import { JwtBody } from './auth/types';
 import { GarmentResolver } from './resolvers/GarmentResolver';
 import { UserResolver } from './resolvers/UserResolver';
+import { BrandResolver } from './resolvers/BrandResolver';
+import { CategoryResolver } from './resolvers/CategoryResolver';
 
 export interface Context {
     user: { id: string; email: string } | null;
@@ -22,7 +24,7 @@ async function main() {
         await createConnection();
         const schema = await buildSchema({
             authChecker: authChecker,
-            resolvers: [UserResolver, GarmentResolver],
+            resolvers: [UserResolver, GarmentResolver, BrandResolver, CategoryResolver],
             container: Container,
             emitSchemaFile: {
                 path: join(__dirname, '../', '/schema.gql'),

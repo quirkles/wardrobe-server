@@ -1,4 +1,4 @@
-import {Resolver, Mutation, Arg, Query, Authorized} from 'type-graphql';
+import { Resolver, Mutation, Arg, Query } from 'type-graphql';
 import { sign } from 'jsonwebtoken';
 import { JWT_SECRET } from '../../config';
 
@@ -7,7 +7,13 @@ import { CreateUserInput } from '../inputs/CreateUserInput';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Repository } from 'typeorm';
 import { encrypt } from '../encrypt';
-import { CreateUserResult, DuplicateUserError, LoginUserResult, UserNotFoundError } from '../responses/userResponses';
+import {
+    CreateUserResult,
+    DuplicateUserError,
+    LoginUserResult,
+    UserNotFoundError,
+    GetUserByIdResult,
+} from '../responses/userResponses';
 import { FallBackServerError } from '../responses/errorResponses';
 import { Service } from 'typedi';
 
@@ -16,9 +22,20 @@ import { Service } from 'typedi';
 export class UserResolver {
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
 
-    @Query(() => String)
-    hello(): string {
-        return 'world';
+    @Query(() => GetUserByIdResult)
+    async getUserById(@Arg('userId') userId: string): Promise<typeof GetUserByIdResult> {
+        const existingUser = await this.userRepository.findOne({
+            relations: ['garments'],
+            where: {
+                id: userId,
+            },
+        });
+        if (existingUser) {
+            console.log(existingUser) //eslint-disable-line
+            return existingUser;
+        }
+            console.log('not found ') //eslint-disable-line
+        return new UserNotFoundError();
     }
 
     @Mutation(() => CreateUserResult)
@@ -30,7 +47,9 @@ export class UserResolver {
             }
             const user = this.userRepository.create(input);
             await user.save();
-            return user;
+            const { email, id } = user;
+            const token = sign({ email, sub: id }, JWT_SECRET);
+            return { user, token };
         } catch (e) {
             return new FallBackServerError({ message: 'Failed to create user', reason: e.message });
         }

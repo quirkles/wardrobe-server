@@ -4,16 +4,20 @@
 # -----------------------------------------------
 
 type Query {
-  hello: String!
+  getUserById(userId: String!): GetUserByIdResult!
+  getBrands: [Brand!]!
+  getCategories: [GarmentCategory!]!
 }
 
-type Mutation {
-  createGarment(input: CreateGarmentInput!): CreateGarmentResult!
-  createUser(input: CreateUserInput!): CreateUserResult!
-  loginUser(password: String!, email: String!): LoginUserResult!
-}
+union GetUserByIdResult = User | UserNotFoundError
 
-union CreateGarmentResult = Garment | InvalidSubcategoryError | InvalidBrandError | InvalidOwnerError | UnauthorizedError | FallBackServerError
+type User {
+  id: ID!
+  email: String!
+  firstName: String
+  lastName: String
+  garments: [Garment!]!
+}
 
 type Garment {
   id: ID!
@@ -24,14 +28,6 @@ type Garment {
   category: GarmentCategory!
   subCategory: GarmentSubCategory!
   images: [GarmentImage!]!
-}
-
-type User {
-  id: ID!
-  email: String!
-  firstName: String
-  lastName: String
-  garments: [Garment!]!
 }
 
 type Brand {
@@ -63,7 +59,7 @@ type GarmentImage {
   garment: Garment!
 }
 
-type InvalidSubcategoryError {
+type UserNotFoundError {
   responseType: String!
   type: ErrorSource!
   reason: String!
@@ -73,6 +69,20 @@ type InvalidSubcategoryError {
 enum ErrorSource {
   ServerError
   ClientError
+}
+
+type Mutation {
+  createGarment(input: CreateGarmentInput!): CreateGarmentResult!
+  createUser(input: CreateUserInput!): CreateUserResult!
+  loginUser(password: String!, email: String!): LoginUserResult!
+}
+
+union CreateGarmentResult = Garment | InvalidSubcategoryError | InvalidBrandError | InvalidOwnerError | UnauthorizedError | FallBackServerError
+
+type InvalidSubcategoryError {
+  responseType: String!
+  type: ErrorSource!
+  reason: String!
 }
 
 type InvalidBrandError {
@@ -110,7 +120,12 @@ input CreateGarmentInput {
   imageUrls: [String!]
 }
 
-union CreateUserResult = User | DuplicateUserError | FallBackServerError
+union CreateUserResult = UserAndToken | DuplicateUserError | FallBackServerError
+
+type UserAndToken {
+  user: User!
+  token: String!
+}
 
 type DuplicateUserError {
   responseType: String!
@@ -126,14 +141,3 @@ input CreateUserInput {
 }
 
 union LoginUserResult = UserAndToken | UserNotFoundError | FallBackServerError
-
-type UserAndToken {
-  user: User!
-  token: String!
-}
-
-type UserNotFoundError {
-  responseType: String!
-  type: ErrorSource!
-  reason: String!
-}

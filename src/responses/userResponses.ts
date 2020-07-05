@@ -37,10 +37,10 @@ export class UserAndToken {
 
 export const CreateUserResult = createUnionType({
     name: 'CreateUserResult',
-    types: () => [User, DuplicateUserError, FallBackServerError] as const,
+    types: () => [UserAndToken, DuplicateUserError, FallBackServerError] as const,
     resolveType: (value) => {
-        if ('id' in value) {
-            return 'User';
+        if ('user' in value) {
+            return 'UserAndToken';
         }
         return value.responseType;
     },
@@ -52,6 +52,17 @@ export const LoginUserResult = createUnionType({
     resolveType: (value) => {
         if ('user' in value) {
             return UserAndToken;
+        }
+        return value.responseType;
+    },
+});
+
+export const GetUserByIdResult = createUnionType({
+    name: 'GetUserByIdResult',
+    types: () => [User, UserNotFoundError] as const,
+    resolveType: (value) => {
+        if ('id' in value) {
+            return User;
         }
         return value.responseType;
     },
