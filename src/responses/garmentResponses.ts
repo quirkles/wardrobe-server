@@ -40,7 +40,15 @@ export class InvalidOwnerError implements BaseError {
 
 export const CreateGarmentResult = createUnionType({
     name: 'CreateGarmentResult',
-    types: () => [Garment, InvalidSubcategoryError, InvalidBrandError, InvalidOwnerError, UnauthorizedError, FallBackServerError] as const,
+    types: () =>
+        [
+            Garment,
+            InvalidSubcategoryError,
+            InvalidBrandError,
+            InvalidOwnerError,
+            UnauthorizedError,
+            FallBackServerError,
+        ] as const,
     resolveType: (value) => {
         if ('id' in value) {
             return 'Garment';

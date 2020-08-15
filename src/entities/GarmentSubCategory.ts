@@ -10,7 +10,7 @@ import { Garment } from './Garment';
 export class GarmentSubCategory extends BaseEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn()
-    readonly id: number;
+    readonly id: string;
 
     @Field()
     @Column()

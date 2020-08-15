@@ -1,6 +1,4 @@
 import { InputType, Field } from 'type-graphql';
-import { User } from '../entities/User';
-import { Garment } from '../entities/Garment';
 
 @InputType()
 export class CreateGarmentInput {

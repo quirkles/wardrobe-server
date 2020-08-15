@@ -25,7 +25,7 @@ export class UserResolver {
     @Query(() => GetUserByIdResult)
     async getUserById(@Arg('userId') userId: string): Promise<typeof GetUserByIdResult> {
         const existingUser = await this.userRepository.findOne({
-            relations: ['garments'],
+            relations: ['garments', 'garments.brand', 'garments.subCategory'],
             where: {
                 id: userId,
             },

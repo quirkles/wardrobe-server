@@ -1,13 +1,4 @@
-import {
-    PrimaryGeneratedColumn,
-    Column,
-    Entity,
-    BaseEntity,
-    BeforeInsert,
-    BeforeUpdate,
-    ManyToOne,
-    OneToMany,
-} from 'typeorm';
+import { PrimaryGeneratedColumn, Column, Entity, BaseEntity, ManyToOne, OneToMany } from 'typeorm';
 import { Field, ID, ObjectType } from 'type-graphql';
 
 import { GarmentCategory } from './GarmentCategory';
@@ -21,7 +12,7 @@ import { Brand } from './Brand';
 export class Garment extends BaseEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn()
-    readonly id: number;
+    readonly id: string;
 
     @Field()
     @Column()

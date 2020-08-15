@@ -5,8 +5,9 @@
 
 type Query {
   getUserById(userId: String!): GetUserByIdResult!
-  getBrands: [Brand!]!
+  getBrands(query: String!): [Brand!]!
   getCategories: [GarmentCategory!]!
+  getGarmentById(garmentId: String!): Garment!
 }
 
 union GetUserByIdResult = User | UserNotFoundError
