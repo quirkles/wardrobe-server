@@ -15,6 +15,9 @@ export class CreateGarmentInput {
     brandId: string;
 
     @Field()
+    colorId: string;
+
+    @Field()
     subCategoryId: string;
 
     @Field(() => [String], { nullable: true })

@@ -1,4 +1,4 @@
-import { Arg, Authorized, Ctx, Mutation, Resolver } from 'type-graphql';
+import {Arg, Authorized, Ctx, Mutation, Query, Resolver} from 'type-graphql';
 import { Service } from 'typedi';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Repository } from 'typeorm';
@@ -8,6 +8,7 @@ import { FallBackServerError, UnauthorizedError } from '../responses/errorRespon
 import {
     CreateGarmentResult,
     InvalidBrandError,
+    InvalidColorError,
     InvalidOwnerError,
     InvalidSubcategoryError,
 } from '../responses/garmentResponses';
@@ -17,6 +18,7 @@ import { Context } from '../index';
 import { GarmentImage } from '../entities/GarmentImage';
 import { Brand } from '../entities/Brand';
 import { User } from '../entities/User';
+import { Color } from '../entities/Color';
 
 @Resolver()
 @Service()
@@ -30,6 +32,8 @@ export class GarmentResolver {
         private readonly garmentImageRepository: Repository<GarmentImage>,
         @InjectRepository(Brand)
         private readonly brandRepository: Repository<Brand>,
+        @InjectRepository(Color)
+        private readonly colorRepository: Repository<Color>,
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
     ) {}
@@ -41,11 +45,8 @@ export class GarmentResolver {
         @Ctx() ctx: Context,
     ): Promise<typeof CreateGarmentResult> {
         try {
-            const { subCategoryId, title, description, ownerId, imageUrls, brandId } = input;
+            const { subCategoryId, title, description, ownerId, imageUrls, brandId, colorId } = input;
             if (String(ctx.user?.id) !== String(ownerId)) {
-                console.log('!!!') //eslint-disable-line
-                console.log(ownerId) //eslint-disable-line
-                console.log(ctx.user?.id) //eslint-disable-line
                 return new UnauthorizedError({ message: 'Could not create garment' });
             }
             const owner = await this.userRepository.findOne(ownerId);
@@ -64,11 +65,17 @@ export class GarmentResolver {
                 return new InvalidBrandError();
             }
 
+            const color = await this.colorRepository.findOne(colorId);
+            if (!color) {
+                return new InvalidColorError();
+            }
+
             const garment = this.garmentRepository.create({
                 title,
                 owner,
                 description,
                 brand,
+                color,
                 category: subCategory.parentCategory,
                 subCategory,
             });
@@ -85,5 +92,12 @@ export class GarmentResolver {
         } catch (e) {
             return new FallBackServerError({ message: 'Failed to create user', reason: e.message });
         }
+    }
+
+    @Query(() => Garment)
+    async getGarmentById(@Arg('garmentId') garmentId: string): Promise<Garment | undefined> {
+        return this.garmentRepository.findOne(garmentId, {
+            relations: ['owner', 'brand', 'category', 'subCategory', 'images', 'color'],
+        });
     }
 }

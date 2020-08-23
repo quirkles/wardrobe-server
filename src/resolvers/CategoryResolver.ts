@@ -21,11 +21,4 @@ export class CategoryResolver {
         });
         return garmentCategories || [];
     }
-
-    @Query(() => Garment)
-    async getGarmentById(@Arg('garmentId') garmentId: string): Promise<Garment | undefined> {
-        return this.garmentRepository.findOne(garmentId, {
-            relations: ['owner', 'brand', 'category', 'subCategory', 'images'],
-        });
-    }
 }
