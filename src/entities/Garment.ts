@@ -6,6 +6,7 @@ import { GarmentSubCategory } from './GarmentSubCategory';
 import { User } from './User';
 import { GarmentImage } from './GarmentImage';
 import { Brand } from './Brand';
+import { Color } from './Color';
 
 @ObjectType()
 @Entity()
@@ -29,6 +30,10 @@ export class Garment extends BaseEntity {
     @Field(() => Brand)
     @ManyToOne(() => Brand, (brand: Brand) => brand.garments)
     brand: Brand;
+
+    @Field(() => Color)
+    @ManyToOne(() => Color, (color: Color) => color.garments)
+    color: Color;
 
     @Field(() => GarmentCategory)
     @ManyToOne(() => GarmentCategory, (garmentCategory: GarmentCategory) => garmentCategory.garments)

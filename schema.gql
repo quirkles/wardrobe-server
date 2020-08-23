@@ -8,6 +8,7 @@ type Query {
   getBrands(query: String!): [Brand!]!
   getCategories: [GarmentCategory!]!
   getGarmentById(garmentId: String!): Garment!
+  getColors(query: String!): [Color!]!
 }
 
 union GetUserByIdResult = User | UserNotFoundError
@@ -26,12 +27,20 @@ type Garment {
   description: String!
   owner: User!
   brand: Brand!
+  color: Color!
   category: GarmentCategory!
   subCategory: GarmentSubCategory!
   images: [GarmentImage!]!
 }
 
 type Brand {
+  id: ID!
+  slug: String!
+  name: String!
+  garments: [Garment!]!
+}
+
+type Color {
   id: ID!
   slug: String!
   name: String!
