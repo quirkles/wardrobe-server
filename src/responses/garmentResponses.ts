@@ -15,6 +15,18 @@ export class InvalidSubcategoryError implements BaseError {
 }
 
 @ObjectType()
+export class InvalidGarmentError implements BaseError {
+    @Field(() => String)
+    readonly responseType = 'InvalidGarmentError';
+
+    @Field(() => ErrorSource)
+    readonly type: ErrorSource = ErrorSource.ClientError;
+
+    @Field(() => String)
+    readonly reason = 'No garment found with that id';
+}
+
+@ObjectType()
 export class InvalidBrandError implements BaseError {
     @Field(() => String)
     readonly responseType = 'InvalidBrandError';
@@ -56,6 +68,27 @@ export const CreateGarmentResult = createUnionType({
         [
             Garment,
             InvalidSubcategoryError,
+            InvalidBrandError,
+            InvalidColorError,
+            InvalidOwnerError,
+            UnauthorizedError,
+            FallBackServerError,
+        ] as const,
+    resolveType: (value) => {
+        if ('id' in value) {
+            return 'Garment';
+        }
+        return value.responseType;
+    },
+});
+
+export const UpdateGarmentResult = createUnionType({
+    name: 'UpdateGarmentResult',
+    types: () =>
+        [
+            Garment,
+            InvalidSubcategoryError,
+            InvalidGarmentError,
             InvalidBrandError,
             InvalidColorError,
             InvalidOwnerError,

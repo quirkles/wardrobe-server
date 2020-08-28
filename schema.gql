@@ -83,6 +83,7 @@ enum ErrorSource {
 
 type Mutation {
   createGarment(input: CreateGarmentInput!): CreateGarmentResult!
+  updateGarment(garmentData: UpdateGarmentInput!): UpdateGarmentResult!
   createUser(input: CreateUserInput!): CreateUserResult!
   loginUser(password: String!, email: String!): LoginUserResult!
 }
@@ -134,6 +135,24 @@ input CreateGarmentInput {
   brandId: String!
   colorId: String!
   subCategoryId: String!
+  imageUrls: [String!]
+}
+
+union UpdateGarmentResult = Garment | InvalidSubcategoryError | InvalidGarmentError | InvalidBrandError | InvalidColorError | InvalidOwnerError | UnauthorizedError | FallBackServerError
+
+type InvalidGarmentError {
+  responseType: String!
+  type: ErrorSource!
+  reason: String!
+}
+
+input UpdateGarmentInput {
+  garmentId: String!
+  title: String
+  description: String
+  brandId: String
+  colorId: String
+  subCategoryId: String
   imageUrls: [String!]
 }
 
