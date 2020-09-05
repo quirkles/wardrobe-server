@@ -13,9 +13,13 @@ export class GarmentImage extends BaseEntity {
     @Column({
         unique: true,
     })
-    imageUrl: string;
+    url: string;
 
-    @Field(() => Garment)
+    @Field()
+    @Column()
+    name: string;
+
+    @Field(() => Garment, { nullable: true })
     @ManyToOne(() => Garment, (garment: Garment) => garment.images)
-    garment: Garment;
+    garment?: Garment;
 }

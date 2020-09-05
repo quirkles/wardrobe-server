@@ -38,6 +38,20 @@ export interface BaseError extends WithResponseType, GenericError {
     readonly reason: string;
 }
 
+export abstract class EntityNotFoundError implements BaseError {
+    @Field()
+    readonly responseType: string = 'EntityNotFoundError';
+
+    @Field()
+    readonly type: ErrorSource = ErrorSource.ClientError;
+
+    @Field()
+    readonly reason: string = 'Requested entity not found';
+
+    @Field()
+    message: string;
+}
+
 @ObjectType()
 export class FallBackClientError implements BaseError {
     @Field()
@@ -72,6 +86,8 @@ export class FallBackServerError implements BaseError {
         this.message = message || this.message;
     }
 }
+
+@ObjectType()
 
 @ObjectType()
 export class UnauthorizedError implements BaseError {

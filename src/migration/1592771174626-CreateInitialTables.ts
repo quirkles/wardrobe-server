@@ -44,9 +44,10 @@ export class CreateInitialTables1592771174626 implements MigrationInterface {
             `CREATE TABLE "garment_image"
                  (
                      "id"        uuid DEFAULT uuid_generate_v4(),
-                     "imageUrl"  character varying NOT NULL,
+                     "url"  character varying NOT NULL,
+                     "name"  character varying NOT NULL,
                      "garmentId" uuid,
-                     CONSTRAINT "UQ_fdb24acf69b934be7f8648fad5b" UNIQUE ("imageUrl"),
+                     CONSTRAINT "UQ_fdb24acf69b934be7f8648fad5b" UNIQUE ("url"),
                      CONSTRAINT "PK_7865d2999592ad1780ade713b95" PRIMARY KEY ("id")
                  )`,
         );

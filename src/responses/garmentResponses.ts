@@ -1,65 +1,32 @@
 import { createUnionType, Field, ObjectType } from 'type-graphql';
-import { BaseError, ErrorSource, FallBackServerError, UnauthorizedError } from './errorResponses';
+import { EntityNotFoundError, ErrorSource, FallBackServerError, UnauthorizedError } from './errorResponses';
 import { Garment } from '../entities/Garment';
+import {
+    InvalidBrandError,
+    InvalidColorError,
+    InvalidGarmentError,
+    InvalidOwnerError,
+    InvalidSubcategoryError,
+} from './invalidRelationResponses';
 
 @ObjectType()
-export class InvalidSubcategoryError implements BaseError {
-    @Field(() => String)
-    readonly responseType = 'InvalidSubcategoryError';
+export class GarmentNotFoundError extends EntityNotFoundError {
+    @Field()
+    readonly type: ErrorSource;
 
-    @Field(() => ErrorSource)
-    readonly type: ErrorSource = ErrorSource.ClientError;
+    @Field()
+    readonly reason: string;
 
-    @Field(() => String)
-    readonly reason = 'No subcategory found with that id';
-}
+    @Field()
+    message: string;
 
-@ObjectType()
-export class InvalidGarmentError implements BaseError {
-    @Field(() => String)
-    readonly responseType = 'InvalidGarmentError';
+    @Field()
+    readonly responseType: string = 'GarmentNotFoundError';
 
-    @Field(() => ErrorSource)
-    readonly type: ErrorSource = ErrorSource.ClientError;
-
-    @Field(() => String)
-    readonly reason = 'No garment found with that id';
-}
-
-@ObjectType()
-export class InvalidBrandError implements BaseError {
-    @Field(() => String)
-    readonly responseType = 'InvalidBrandError';
-
-    @Field(() => ErrorSource)
-    readonly type: ErrorSource = ErrorSource.ClientError;
-
-    @Field(() => String)
-    readonly reason = 'No brand found with that id';
-}
-
-@ObjectType()
-export class InvalidColorError implements BaseError {
-    @Field(() => String)
-    readonly responseType = 'InvalidColorError';
-
-    @Field(() => ErrorSource)
-    readonly type: ErrorSource = ErrorSource.ClientError;
-
-    @Field(() => String)
-    readonly reason = 'No color found with that id';
-}
-
-@ObjectType()
-export class InvalidOwnerError implements BaseError {
-    @Field(() => String)
-    readonly responseType = 'InvalidOwnerError';
-
-    @Field(() => ErrorSource)
-    readonly type: ErrorSource = ErrorSource.ClientError;
-
-    @Field(() => String)
-    readonly reason = 'No user found with that id';
+    constructor(garmentId: string) {
+        super();
+        this.message = `Could not locate garment with id: ${garmentId}`;
+    }
 }
 
 export const CreateGarmentResult = createUnionType({
@@ -95,6 +62,17 @@ export const UpdateGarmentResult = createUnionType({
             UnauthorizedError,
             FallBackServerError,
         ] as const,
+    resolveType: (value) => {
+        if ('id' in value) {
+            return 'Garment';
+        }
+        return value.responseType;
+    },
+});
+
+export const GarmentResult = createUnionType({
+    name: 'GarmentResult',
+    types: () => [Garment, GarmentNotFoundError, FallBackServerError] as const,
     resolveType: (value) => {
         if ('id' in value) {
             return 'Garment';

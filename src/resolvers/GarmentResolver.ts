@@ -5,15 +5,6 @@ import { Repository } from 'typeorm';
 
 import { Garment } from '../entities/Garment';
 import { FallBackServerError, UnauthorizedError } from '../responses/errorResponses';
-import {
-    CreateGarmentResult,
-    InvalidBrandError,
-    InvalidColorError,
-    InvalidGarmentError,
-    InvalidOwnerError,
-    InvalidSubcategoryError,
-    UpdateGarmentResult,
-} from '../responses/garmentResponses';
 import { CreateGarmentInput } from '../inputs/CreateGarmentInput';
 import { GarmentSubCategory } from '../entities/GarmentSubCategory';
 import { Context } from '../index';
@@ -22,6 +13,19 @@ import { Brand } from '../entities/Brand';
 import { User } from '../entities/User';
 import { Color } from '../entities/Color';
 import { UpdateGarmentInput } from '../inputs/UpdateGarmentInput';
+import {
+    CreateGarmentResult,
+    GarmentNotFoundError,
+    GarmentResult,
+    UpdateGarmentResult,
+} from '../responses/garmentResponses';
+import {
+    InvalidBrandError,
+    InvalidColorError,
+    InvalidGarmentError,
+    InvalidOwnerError,
+    InvalidSubcategoryError,
+} from '../responses/invalidRelationResponses';
 
 @Resolver()
 @Service()
@@ -44,7 +48,7 @@ export class GarmentResolver {
     @Authorized('IS_LOGGED_IN')
     @Mutation(() => CreateGarmentResult)
     async createGarment(
-        @Arg('input') input: CreateGarmentInput,
+        @Arg('garmentData') input: CreateGarmentInput,
         @Ctx() ctx: Context,
     ): Promise<typeof CreateGarmentResult> {
         try {
@@ -85,7 +89,7 @@ export class GarmentResolver {
 
             if (imageUrls && imageUrls.length) {
                 const garmentImages: GarmentImage[] = imageUrls.map((imageUrl) =>
-                    this.garmentImageRepository.create({ imageUrl }),
+                    this.garmentImageRepository.create({ url: imageUrl }),
                 );
                 garment.images = garmentImages;
             }
@@ -174,10 +178,15 @@ export class GarmentResolver {
         }
     }
 
-    @Query(() => Garment)
-    async getGarmentById(@Arg('garmentId') garmentId: string): Promise<Garment | undefined> {
-        return this.garmentRepository.findOne(garmentId, {
+    @Query(() => GarmentResult)
+    async getGarmentById(@Arg('garmentId') garmentId: string): Promise<typeof GarmentResult> {
+        const garment = await this.garmentRepository.findOne(garmentId, {
             relations: ['owner', 'brand', 'category', 'subCategory', 'images', 'color'],
         });
+
+        if (garment) {
+            return garment;
+        }
+        return new GarmentNotFoundError(garmentId);
     }
 }

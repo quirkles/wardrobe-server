@@ -14,6 +14,7 @@ import { UserResolver } from './resolvers/UserResolver';
 import { BrandResolver } from './resolvers/BrandResolver';
 import { CategoryResolver } from './resolvers/CategoryResolver';
 import { ColorResolver } from './resolvers/ColorResolver';
+import { GarmentImageResolver } from './resolvers/GarmentImage';
 
 export interface Context {
     user: { id: string; email: string } | null;
@@ -25,7 +26,14 @@ async function main() {
         await createConnection();
         const schema = await buildSchema({
             authChecker: authChecker,
-            resolvers: [UserResolver, GarmentResolver, BrandResolver, ColorResolver, CategoryResolver],
+            resolvers: [
+                UserResolver,
+                GarmentResolver,
+                GarmentImageResolver,
+                BrandResolver,
+                ColorResolver,
+                CategoryResolver,
+            ],
             container: Container,
             emitSchemaFile: {
                 path: join(__dirname, '../', '/schema.gql'),

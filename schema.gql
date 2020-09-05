@@ -4,12 +4,14 @@
 # -----------------------------------------------
 
 type Query {
-  getGarmentById(garmentId: String!): Garment!
+  getGarmentById(garmentId: String!): GarmentResult!
   getUserById(userId: String!): GetUserByIdResult!
   getBrands(query: String!): [Brand!]!
   getCategories: [GarmentCategory!]!
   getColors(query: String!): [Color!]!
 }
+
+union GarmentResult = Garment | GarmentNotFoundError | FallBackServerError
 
 type Garment {
   id: ID!
@@ -63,8 +65,23 @@ type GarmentSubCategory {
 
 type GarmentImage {
   id: ID!
-  imageUrl: String!
-  garment: Garment!
+  url: String!
+  name: String!
+  garment: Garment
+}
+
+type GarmentNotFoundError {
+  type: String!
+  reason: String!
+  message: String!
+  responseType: String!
+}
+
+type FallBackServerError {
+  responseType: String!
+  type: String!
+  reason: String!
+  message: String!
 }
 
 union GetUserByIdResult = User | UserNotFoundError
@@ -82,10 +99,11 @@ enum ErrorSource {
 }
 
 type Mutation {
-  createGarment(input: CreateGarmentInput!): CreateGarmentResult!
+  createGarment(garmentData: CreateGarmentInput!): CreateGarmentResult!
   updateGarment(garmentData: UpdateGarmentInput!): UpdateGarmentResult!
   createUser(input: CreateUserInput!): CreateUserResult!
   loginUser(password: String!, email: String!): LoginUserResult!
+  createGarmentImage(input: CreateGarmentImageInput!): CreateGarmentImageResult!
 }
 
 union CreateGarmentResult = Garment | InvalidSubcategoryError | InvalidBrandError | InvalidColorError | InvalidOwnerError | UnauthorizedError | FallBackServerError
@@ -115,13 +133,6 @@ type InvalidOwnerError {
 }
 
 type UnauthorizedError {
-  responseType: String!
-  type: String!
-  reason: String!
-  message: String!
-}
-
-type FallBackServerError {
   responseType: String!
   type: String!
   reason: String!
@@ -177,3 +188,11 @@ input CreateUserInput {
 }
 
 union LoginUserResult = UserAndToken | UserNotFoundError | FallBackServerError
+
+union CreateGarmentImageResult = GarmentImage | InvalidGarmentError | UnauthorizedError | FallBackServerError
+
+input CreateGarmentImageInput {
+  garmentId: String
+  imageName: String!
+  imageUrl: String!
+}
