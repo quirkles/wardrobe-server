@@ -21,5 +21,5 @@ export class CreateGarmentInput {
     subCategoryId: string;
 
     @Field(() => [String], { nullable: true })
-    imageUrls?: string[];
+    garmentImageIds?: string[];
 }

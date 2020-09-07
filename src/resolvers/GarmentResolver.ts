@@ -1,7 +1,7 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import { Service } from 'typedi';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { Garment } from '../entities/Garment';
 import { FallBackServerError, UnauthorizedError } from '../responses/errorResponses';
@@ -52,7 +52,8 @@ export class GarmentResolver {
         @Ctx() ctx: Context,
     ): Promise<typeof CreateGarmentResult> {
         try {
-            const { subCategoryId, title, description, ownerId, imageUrls, brandId, colorId } = input;
+            const { subCategoryId, title, description, ownerId, garmentImageIds, brandId, colorId } = input;
+
             if (String(ctx.user?.id) !== String(ownerId)) {
                 return new UnauthorizedError({ message: 'Could not create garment' });
             }
@@ -77,27 +78,29 @@ export class GarmentResolver {
                 return new InvalidColorError();
             }
 
+            let garmentImages = [] as GarmentImage[];
+            if (garmentImageIds && garmentImageIds.length) {
+                garmentImages = await this.garmentImageRepository.find({
+                    id: In(garmentImageIds),
+                });
+            }
+
             const garment = this.garmentRepository.create({
                 title,
                 owner,
                 description,
                 brand,
                 color,
+                images: garmentImages,
                 category: subCategory.parentCategory,
                 subCategory,
             });
 
-            if (imageUrls && imageUrls.length) {
-                const garmentImages: GarmentImage[] = imageUrls.map((imageUrl) =>
-                    this.garmentImageRepository.create({ url: imageUrl }),
-                );
-                garment.images = garmentImages;
-            }
-
             await garment.save();
             return garment;
-        } catch (e) {
-            return new FallBackServerError({ message: 'Failed to create user', reason: e.message });
+        } catch (error) {
+            ctx.logger.warn({ error });
+            return new FallBackServerError({ message: 'Failed to create garment', reason: error.message });
         }
     }
 
@@ -108,12 +111,13 @@ export class GarmentResolver {
         @Ctx() ctx: Context,
     ): Promise<typeof UpdateGarmentResult> {
         try {
-            const { garmentId, subCategoryId, title, description, brandId, colorId } = input;
+            const { garmentId, subCategoryId, title, description, brandId, colorId, garmentImageIds } = input;
 
             let subCategory;
             let category;
             let brand;
             let color;
+            let garmentImages;
 
             const garment = await this.garmentRepository.findOne(garmentId, {
                 relations: ['owner'],
@@ -153,6 +157,12 @@ export class GarmentResolver {
                 }
             }
 
+            if (garmentImageIds) {
+                garmentImages = await this.garmentImageRepository.find({
+                    id: In(garmentImageIds),
+                });
+            }
+
             if (title) {
                 garment.title = title;
             }
@@ -171,10 +181,14 @@ export class GarmentResolver {
             if (color) {
                 garment.color = color;
             }
+            if (garmentImages) {
+                garment.images = garmentImages;
+            }
             await garment.save();
             return garment;
         } catch (e) {
-            return new FallBackServerError({ message: 'Failed to create user', reason: e.message });
+            ctx.logger.warn(e);
+            return new FallBackServerError({ message: 'Failed to update garment', reason: e.message });
         }
     }
 

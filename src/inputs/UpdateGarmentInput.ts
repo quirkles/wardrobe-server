@@ -1,25 +1,8 @@
 import { InputType, Field } from 'type-graphql';
+import { CreateGarmentInput } from './CreateGarmentInput';
 
 @InputType()
-export class UpdateGarmentInput {
+export class UpdateGarmentInput extends CreateGarmentInput {
     @Field()
     garmentId: string;
-
-    @Field({ nullable: true })
-    title: string;
-
-    @Field({ nullable: true })
-    description: string;
-
-    @Field({ nullable: true })
-    brandId: string;
-
-    @Field({ nullable: true })
-    colorId: string;
-
-    @Field({ nullable: true })
-    subCategoryId: string;
-
-    @Field(() => [String], { nullable: true })
-    imageUrls: string[];
 }

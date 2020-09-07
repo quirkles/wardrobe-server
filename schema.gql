@@ -103,7 +103,7 @@ type Mutation {
   updateGarment(garmentData: UpdateGarmentInput!): UpdateGarmentResult!
   createUser(input: CreateUserInput!): CreateUserResult!
   loginUser(password: String!, email: String!): LoginUserResult!
-  createGarmentImage(input: CreateGarmentImageInput!): CreateGarmentImageResult!
+  createGarmentImage(garmentImageData: CreateGarmentImageInput!): CreateGarmentImageResult!
 }
 
 union CreateGarmentResult = Garment | InvalidSubcategoryError | InvalidBrandError | InvalidColorError | InvalidOwnerError | UnauthorizedError | FallBackServerError
@@ -146,7 +146,7 @@ input CreateGarmentInput {
   brandId: String!
   colorId: String!
   subCategoryId: String!
-  imageUrls: [String!]
+  garmentImageIds: [String!]
 }
 
 union UpdateGarmentResult = Garment | InvalidSubcategoryError | InvalidGarmentError | InvalidBrandError | InvalidColorError | InvalidOwnerError | UnauthorizedError | FallBackServerError
@@ -158,13 +158,14 @@ type InvalidGarmentError {
 }
 
 input UpdateGarmentInput {
+  ownerId: String!
+  title: String!
+  description: String!
+  brandId: String!
+  colorId: String!
+  subCategoryId: String!
+  garmentImageIds: [String!]
   garmentId: String!
-  title: String
-  description: String
-  brandId: String
-  colorId: String
-  subCategoryId: String
-  imageUrls: [String!]
 }
 
 union CreateUserResult = UserAndToken | DuplicateUserError | FallBackServerError

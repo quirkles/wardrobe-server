@@ -5,6 +5,8 @@ import { buildSchema } from 'type-graphql';
 import { join } from 'path';
 import { Container } from 'typedi';
 
+import { logger } from './logger';
+import { v4 as uuid } from 'uuid';
 import { authChecker } from './auth/authChecker';
 import { verify } from 'jsonwebtoken';
 import { JWT_SECRET } from '../config';
@@ -14,10 +16,12 @@ import { UserResolver } from './resolvers/UserResolver';
 import { BrandResolver } from './resolvers/BrandResolver';
 import { CategoryResolver } from './resolvers/CategoryResolver';
 import { ColorResolver } from './resolvers/ColorResolver';
-import { GarmentImageResolver } from './resolvers/GarmentImage';
+import { GarmentImageResolver } from './resolvers/GarmentImageResolver';
+import { Logger } from 'pino';
 
 export interface Context {
     user: { id: string; email: string } | null;
+    logger: Logger;
 }
 
 async function main() {
@@ -45,7 +49,13 @@ async function main() {
             schema,
             context: ({ req }): Context => {
                 let user = null;
+                let requestLogger = logger;
                 try {
+                    requestLogger = logger.child({
+                        requestId: uuid(),
+                    });
+                    requestLogger.info('received request:');
+                    requestLogger.info(req);
                     const authHeader = req.headers.authorization || '';
                     const token = authHeader.split('Bearer ')[1];
                     if (token) {
@@ -53,15 +63,15 @@ async function main() {
                         user = { email, id: sub };
                     }
                 } catch (e) {
-                    console.log(e) //eslint-disable-line
+                    logger.error(e);
                 }
-                return { user };
+                return { user, logger: requestLogger };
             },
         });
         await server.listen(4000);
-        console.log('Server has started!');
+        logger.info('Server has started!');
     } catch (e) {
-        console.log(e) //eslint-disable-line
+        logger.error(e) //eslint-disable-line
     }
 }
 

@@ -1,4 +1,4 @@
-import { Resolver, Query, Arg } from 'type-graphql';
+import { Resolver, Query } from 'type-graphql';
 
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Repository } from 'typeorm';

@@ -1,5 +1,4 @@
 import { Field, ObjectType, registerEnumType } from 'type-graphql';
-import { TypeInfo } from 'graphql';
 
 export enum ErrorSource {
     ServerError = 'ServerError',
@@ -25,8 +24,6 @@ interface ErrorProps {
     reason?: string;
     message?: string;
 }
-
-const GENERIC_ERROR_TYPE = 'GenericError';
 
 export interface BaseError extends WithResponseType, GenericError {
     readonly responseType: string;
@@ -86,8 +83,6 @@ export class FallBackServerError implements BaseError {
         this.message = message || this.message;
     }
 }
-
-@ObjectType()
 
 @ObjectType()
 export class UnauthorizedError implements BaseError {

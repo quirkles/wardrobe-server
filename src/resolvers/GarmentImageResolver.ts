@@ -18,14 +18,16 @@ export class GarmentImageResolver {
         @InjectRepository(Garment) private readonly garmentRepository: Repository<Garment>,
     ) {}
 
-    // @Authorized('IS_LOGGED_IN')
+    @Authorized('IS_LOGGED_IN')
     @Mutation(() => CreateGarmentImageResult)
-    async createGarmentImage(@Arg('input') input: CreateGarmentImageInput): Promise<typeof CreateGarmentImageResult> {
+    async createGarmentImage(
+        @Arg('garmentImageData') garmentImageData: CreateGarmentImageInput,
+    ): Promise<typeof CreateGarmentImageResult> {
         try {
-            const { garmentId, ...garmentImageData } = input;
+            const { garmentId, ...imageData } = garmentImageData;
             const garmentImage = this.garmentImageRepository.create({
-                name: garmentImageData.imageName,
-                url: garmentImageData.imageUrl,
+                name: imageData.imageName,
+                url: imageData.imageUrl,
             });
             if (garmentId) {
                 const garment = await this.garmentRepository.findOne(garmentId);
