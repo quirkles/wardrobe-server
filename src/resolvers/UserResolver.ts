@@ -1,6 +1,6 @@
 import { Resolver, Mutation, Arg, Query } from 'type-graphql';
 import { sign } from 'jsonwebtoken';
-import { JWT_SECRET } from '../../config';
+import { JWT_SECRET } from '../config';
 
 import { User } from '../entities/User';
 import { CreateUserInput } from '../inputs/CreateUserInput';

@@ -3,7 +3,7 @@ import { verify } from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import { Logger } from 'pino';
 
-import { JWT_SECRET } from '../../config';
+import { JWT_SECRET } from '../config';
 import { JwtBody } from '../auth/types';
 import { APIGatewayProxyEvent, Context as LambdaContext } from 'aws-lambda';
 

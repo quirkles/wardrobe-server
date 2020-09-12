@@ -1,6 +1,6 @@
 import { createCipheriv, createDecipheriv } from 'crypto';
 
-import { ENCRYPTION_KEY, ENCRYPTION_IV } from '../../config';
+import { ENCRYPTION_KEY, ENCRYPTION_IV } from '../config';
 
 const algorithm = 'aes-256-cbc';
 let key = Buffer.alloc(32);
