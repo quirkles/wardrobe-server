@@ -7,7 +7,6 @@ import { Garment } from '../entities/Garment';
 import { FallBackServerError, UnauthorizedError } from '../responses/errorResponses';
 import { CreateGarmentInput } from '../inputs/CreateGarmentInput';
 import { GarmentSubCategory } from '../entities/GarmentSubCategory';
-import { Context } from '../index';
 import { GarmentImage } from '../entities/GarmentImage';
 import { Brand } from '../entities/Brand';
 import { User } from '../entities/User';
@@ -26,6 +25,7 @@ import {
     InvalidOwnerError,
     InvalidSubcategoryError,
 } from '../responses/invalidRelationResponses';
+import { AppContext } from '../server/appContext';
 
 @Resolver()
 @Service()
@@ -49,7 +49,7 @@ export class GarmentResolver {
     @Mutation(() => CreateGarmentResult)
     async createGarment(
         @Arg('garmentData') input: CreateGarmentInput,
-        @Ctx() ctx: Context,
+        @Ctx() ctx: AppContext,
     ): Promise<typeof CreateGarmentResult> {
         try {
             const { subCategoryId, title, description, ownerId, garmentImageIds, brandId, colorId } = input;
@@ -108,7 +108,7 @@ export class GarmentResolver {
     @Mutation(() => UpdateGarmentResult)
     async updateGarment(
         @Arg('garmentData') input: UpdateGarmentInput,
-        @Ctx() ctx: Context,
+        @Ctx() ctx: AppContext,
     ): Promise<typeof UpdateGarmentResult> {
         try {
             const { garmentId, subCategoryId, title, description, brandId, colorId, garmentImageIds } = input;
