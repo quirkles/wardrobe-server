@@ -1,10 +1,12 @@
 import * as path from 'path';
 import dotenv from 'dotenv';
 
-const env = process.env.APP_ENV || 'local';
-const file = `.${env}.env`;
-const configPath = path.resolve(process.cwd(), file);
-dotenv.config({ path: configPath });
+const env = process.env.APP_ENV;
+if (env && env === 'local') {
+    // Use dotenv locally, serverless sets them on lambda
+    const configPath = path.resolve(process.cwd(), '.local.env');
+    dotenv.config({ path: configPath });
+}
 
 export const JWT_SECRET = process.env.JWT_SECRET || '';
 export const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || '';

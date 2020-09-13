@@ -3,7 +3,7 @@ import * as os from 'os';
 import { join } from 'path';
 
 let logOutput: string | number = 1;
-if (process.env.APP_ENV && process.env.APP_ENV === 'dev') {
+if (process.env.APP_ENV && process.env.APP_ENV === 'local') {
     logOutput = join(__dirname, '..', 'logs', `server.log`);
 }
 
