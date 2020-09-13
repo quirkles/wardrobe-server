@@ -2,6 +2,7 @@ node_modules
 .idea
 .build
 .serverless
+dist
 
 .*.env
 logs/*.log

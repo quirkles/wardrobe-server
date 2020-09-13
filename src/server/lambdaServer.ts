@@ -74,10 +74,7 @@ export const graphqlHandler = async (
         logger.info('connection created');
         const handler = await createHandler(apolloContext, logger);
         const result = await handler(event, lambdaContext, callback);
-        logger.info(result);
-        logger.info('closing connection');
         await connection.close();
-        return result;
     } catch (e) {
         logger ? logger.error('failed to handle request') : console.log('failed to handle request');
         logger ? logger.error(e) : console.log(e);

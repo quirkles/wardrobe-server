@@ -9,7 +9,6 @@ const configPath = path.resolve(process.cwd(), file);
 dotenv.config({ path: configPath });
 
 module.exports = {
-    plugins: ['serverless-plugin-typescript', 'serverless-functions-base-path'],
     service: 'wardrobe-gql',
     provider: {
         name: 'aws',
@@ -17,7 +16,7 @@ module.exports = {
         environment: {
             JWT_SECRET: process.env.JWT_SECRET,
             ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
-            ENCRYPTION_IV: process.env.ENCRYPTION_KEY,
+            ENCRYPTION_IV: process.env.ENCRYPTION_IV,
             DB_HOST: process.env.DB_HOST,
             DB_PORT: process.env.DB_PORT,
             DB_USERNAME: process.env.DB_USERNAME,
@@ -25,10 +24,11 @@ module.exports = {
             DB_DATABASE: process.env.DB_DATABASE,
         },
     },
+
     functions: {
         graphql: {
-            timeout: 10,
-            handler: 'lambdaServer.graphqlHandler',
+            timeout: 20,
+            handler: 'dist/server/handler.graphql',
             events: [
                 {
                     http: {
@@ -50,8 +50,5 @@ module.exports = {
                 subnetIds: [process.env.VPC_SUBNET_ID_A, process.env.VPC_SUBNET_ID_B],
             },
         },
-    },
-    custom: {
-        functionsBasePath: 'src/server',
     },
 };
