@@ -6,10 +6,10 @@
   "scripts": {
     "migrate": "ts-node ./node_modules/typeorm/cli.js migration:run",
     "lint": "eslint 'src/**/*.{js,ts,tsx}'",
-    "start:dev": "APP_ENV=dev nodemon -w src --ext ts --exec ts-node src/server/devServer.ts",
+    "start:local": "APP_ENV=local nodemon -w src --ext ts --exec ts-node src/server/devServer.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "logs:pp": "tail -f logs/server.log | pino-pretty",
-    "deploy": "serverless deploy"
+    "deploy": "APP_ENV=dev serverless deploy"
   },
   "keywords": [],
   "author": "",

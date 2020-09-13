@@ -2,7 +2,10 @@ import pino, { Logger } from 'pino';
 import * as os from 'os';
 import { join } from 'path';
 
-const logDir = join(__dirname, '..', 'logs', `server.log`);
+let logOutput: string | number = 1;
+if (process.env.APP_ENV && process.env.APP_ENV === 'dev') {
+    logOutput = join(__dirname, '..', 'logs', `server.log`);
+}
 
 let logger: Logger;
 
@@ -16,8 +19,8 @@ export const getLogger = (): Logger => {
                 hostname: os.hostname,
             },
         },
-        pino.destination(logDir),
+        pino.destination(logOutput),
     );
-    logger.info(`Starting logging to ${logDir}`);
+    logger.info(`Starting logging to ${logOutput === 1 ? 'stdout' : logOutput}`);
     return logger;
 };

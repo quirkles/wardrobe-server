@@ -1,34 +1,31 @@
 import 'reflect-metadata';
 import { createConnection, useContainer } from 'typeorm';
 import { ApolloServer } from 'apollo-server-lambda';
+import { Config } from 'apollo-server';
 import { buildSchema } from 'type-graphql';
-import { join } from 'path';
 import { Container } from 'typedi';
+import { APIGatewayProxyCallback, APIGatewayProxyEvent, Context as LambdaContext, Handler } from 'aws-lambda';
 
 import { getLogger } from '../logger';
 import { authChecker } from '../auth/authChecker';
 import resolvers from './resolvers';
 import { createLambdaContext } from './appContext';
-import { APIGatewayProxyCallback, APIGatewayProxyEvent, Context as LambdaContext, Handler } from 'aws-lambda';
 
-const context = createLambdaContext(getLogger());
+import { ormConfig } from '../ormconfig';
+import { Logger } from 'pino';
+import { Connection } from 'typeorm/connection/Connection';
 
-async function createHandler(): Promise<Handler> {
+async function createHandler(apolloContext: Config['context']): Promise<Handler> {
     useContainer(Container);
-    await createConnection();
     const schema = await buildSchema({
         authChecker,
         resolvers: resolvers as any,
         container: Container,
-        emitSchemaFile: {
-            path: join(__dirname, '../', '/schema.gql'),
-            commentDescriptions: true,
-            sortedSchema: false,
-        },
+        emitSchemaFile: false,
     });
     const server = new ApolloServer({
         schema,
-        context,
+        context: apolloContext,
         playground: {
             endpoint: '/dev/graphql',
         },
@@ -36,16 +33,38 @@ async function createHandler(): Promise<Handler> {
 
     return server.createHandler({
         cors: {
-            origin: '*',
+            origin: true,
             credentials: true,
         },
     });
 }
 
-export const graphqlHandler = (
+export const graphqlHandler = async (
     event: APIGatewayProxyEvent,
-    context: LambdaContext,
+    lambdaContext: LambdaContext,
     callback: APIGatewayProxyCallback,
-) => {
-    createHandler().then((handler) => handler(event, context, callback));
+): Promise<void> => {
+    let logger = null as Logger | null;
+    let connection = null as Connection | null;
+    try {
+        logger = getLogger();
+        const apolloContext = createLambdaContext(logger);
+        logger.info('creating connection');
+        connection = await createConnection(ormConfig);
+        logger.info('connection created');
+        const handler = await createHandler(apolloContext);
+        logger.info('handler created');
+        const result = await handler(event, lambdaContext, callback);
+        logger.info(result);
+        logger.info('closing connection');
+        await connection.close();
+        return result;
+    } catch (e) {
+        logger ? logger.error('failed to handle request') : console.log('failed to handle request');
+        logger ? logger.error(e) : console.log(e);
+        if (connection) {
+            logger ? logger.info('closing connection') : console.log('failed to handle request');
+            await connection.close();
+        }
+    }
 };

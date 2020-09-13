@@ -9,6 +9,7 @@ import { getLogger } from '../logger';
 import { authChecker } from '../auth/authChecker';
 import resolvers from './resolvers';
 import { createExpressContext } from './appContext';
+import { ormConfig } from '../ormconfig';
 
 const logger = getLogger();
 const context = createExpressContext(logger);
@@ -16,7 +17,7 @@ const context = createExpressContext(logger);
 async function main(): Promise<void> {
     try {
         useContainer(Container);
-        await createConnection();
+        await createConnection(ormConfig);
         const schema = await buildSchema({
             authChecker,
             resolvers: resolvers as never,

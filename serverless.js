@@ -1,12 +1,12 @@
-// serverless.yml
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-var-requires */
+// eslint-disable @typescript-eslint/no-var-requires
 const dotenv = require('dotenv');
+const path = require('path');
 
-let hasLoaded = false;
-if (!hasLoaded) {
-    dotenv.config();
-    hasLoaded = true;
-}
+const env = process.env.APP_ENV || 'dev';
+const file = `.${env}.env`;
+const configPath = path.resolve(process.cwd(), file);
+dotenv.config({ path: configPath });
 
 module.exports = {
     plugins: ['serverless-plugin-typescript', 'serverless-functions-base-path'],
@@ -18,15 +18,16 @@ module.exports = {
             JWT_SECRET: '',
             ENCRYPTION_KEY: process.env.JWT_SECRET,
             ENCRYPTION_IV: process.env.ENCRYPTION_KEY,
-            DB_HOST: process.env.ENCRYPTION_IV,
-            DB_PORT: process.env.DB_HOST,
-            DB_USERNAME: process.env.DB_PORT,
-            DB_PASSWORD: process.env.DB_USERNAME,
-            DB_DATABASE: process.env.DB_PASSWORD,
+            DB_HOST: process.env.DB_HOST,
+            DB_PORT: process.env.DB_PORT,
+            DB_USERNAME: process.env.DB_USERNAME,
+            DB_PASSWORD: process.env.DB_PASSWORD,
+            DB_DATABASE: process.env.DB_DATABASE,
         },
     },
     functions: {
         graphql: {
+            timeout: 10,
             handler: 'lambdaServer.graphqlHandler',
             events: [
                 {
@@ -44,6 +45,10 @@ module.exports = {
                     },
                 },
             ],
+            vpc: {
+                securityGroupIds: [process.env.VPC_SECURITY_GROUP_ID],
+                subnetIds: [process.env.VPC_SUBNET_ID_A, process.env.VPC_SUBNET_ID_B],
+            },
         },
     },
     custom: {

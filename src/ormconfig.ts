@@ -1,7 +1,8 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } = require('./src/config');
+import { ConnectionOptions } from 'typeorm';
 
-module.exports = {
+import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from './config';
+
+export const ormConfig: ConnectionOptions = {
     type: 'postgres',
     host: DB_HOST,
     port: DB_PORT,
