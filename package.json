@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "migrate": "ts-node ./node_modules/typeorm/cli.js migration:run",
+    "migrate:local": "ts-node ./node_modules/typeorm/cli.js -c local migration:run",
+    "migrate:dev": "ts-node ./node_modules/typeorm/cli.js -c dev migration:run",
     "lint": "eslint 'src/**/*.{js,ts,tsx}'",
     "start:local": "APP_ENV=local nodemon -w src --ext ts --exec ts-node src/server/devServer.ts",
     "test": "echo \"Error: no test specified\" && exit 1",

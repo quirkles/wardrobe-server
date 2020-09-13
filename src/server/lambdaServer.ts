@@ -15,14 +15,16 @@ import { ormConfig } from '../ormconfig';
 import { Logger } from 'pino';
 import { Connection } from 'typeorm/connection/Connection';
 
-async function createHandler(apolloContext: Config['context']): Promise<Handler> {
+async function createHandler(apolloContext: Config['context'], logger: Logger): Promise<Handler> {
     useContainer(Container);
+    logger.info('building schema');
     const schema = await buildSchema({
         authChecker,
         resolvers: resolvers as any,
         container: Container,
         emitSchemaFile: false,
     });
+    logger.info('creating server');
     const server = new ApolloServer({
         schema,
         context: apolloContext,
@@ -31,12 +33,16 @@ async function createHandler(apolloContext: Config['context']): Promise<Handler>
         },
     });
 
-    return server.createHandler({
+    logger.info('creating handler');
+    const handler = await server.createHandler({
         cors: {
             origin: true,
             credentials: true,
         },
     });
+    logger.info('created handler');
+
+    return handler;
 }
 
 export const graphqlHandler = async (
@@ -52,8 +58,7 @@ export const graphqlHandler = async (
         logger.info('creating connection');
         connection = await createConnection(ormConfig);
         logger.info('connection created');
-        const handler = await createHandler(apolloContext);
-        logger.info('handler created');
+        const handler = await createHandler(apolloContext, logger);
         const result = await handler(event, lambdaContext, callback);
         logger.info(result);
         logger.info('closing connection');

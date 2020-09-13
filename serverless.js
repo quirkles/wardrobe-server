@@ -15,8 +15,8 @@ module.exports = {
         name: 'aws',
         runtime: 'nodejs12.x',
         environment: {
-            JWT_SECRET: '',
-            ENCRYPTION_KEY: process.env.JWT_SECRET,
+            JWT_SECRET: process.env.JWT_SECRET,
+            ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
             ENCRYPTION_IV: process.env.ENCRYPTION_KEY,
             DB_HOST: process.env.DB_HOST,
             DB_PORT: process.env.DB_PORT,
