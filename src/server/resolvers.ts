@@ -1,10 +1,13 @@
-import { UserResolver } from '../resolvers/UserResolver';
-import { GarmentResolver } from '../resolvers/GarmentResolver';
-import { GarmentImageResolver } from '../resolvers/GarmentImageResolver';
-import { CategoryResolver } from '../resolvers/CategoryResolver';
-import { BrandResolver } from '../resolvers/BrandResolver';
-import { ColorResolver } from '../resolvers/ColorResolver';
+import {
+    UserResolver,
+    GarmentResolver,
+    GarmentImageResolver,
+    CategoryResolver,
+    BrandResolver,
+    ColorResolver,
+    HealthCheckResolver,
+} from '../resolvers';
 
-const resolvers = [UserResolver, GarmentResolver, GarmentImageResolver, BrandResolver, ColorResolver, CategoryResolver];
+const resolvers = [UserResolver, GarmentResolver, GarmentImageResolver, BrandResolver, ColorResolver, CategoryResolver, HealthCheckResolver];
 
 export default resolvers;
