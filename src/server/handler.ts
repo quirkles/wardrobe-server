@@ -14,6 +14,7 @@ import {
     GarmentImageResolver,
     GarmentResolver,
     UserResolver,
+    HealthCheckResolver
 } from '../resolvers';
 import { Brand, Color, Garment, GarmentCategory, GarmentImage, GarmentSubCategory, User } from '../entities';
 import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from '../config';
@@ -53,6 +54,7 @@ async function bootstrap(event: APIGatewayProxyEvent, context: Context, callback
                 GarmentImageResolver,
                 GarmentResolver,
                 UserResolver,
+                HealthCheckResolver,
             ],
             container: Container,
             emitSchemaFile: false,

@@ -40,11 +40,11 @@ async function main(): Promise<void> {
             authChecker,
             resolvers: resolvers as never,
             container: Container,
-            emitSchemaFile: {
-                path: join(__dirname, '../', '/schema.gql'),
-                commentDescriptions: true,
-                sortedSchema: false,
-            },
+            // emitSchemaFile: {
+            //     path: join(__dirname, '../', '/schema.gql'),
+            //     commentDescriptions: true,
+            //     sortedSchema: false,
+            // },
         });
         const server = new ApolloServer({
             schema,
