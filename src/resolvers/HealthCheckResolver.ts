@@ -7,6 +7,6 @@ import { Service } from 'typedi';
 export class HealthCheckResolver {
     @Query(() => String)
     healthCheck(): string {
-        return 'ok!';
+        return 'server up!';
     }
 }
