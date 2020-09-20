@@ -14,7 +14,7 @@ import {
     GarmentImageResolver,
     GarmentResolver,
     UserResolver,
-    HealthCheckResolver
+    HealthCheckResolver,
 } from '../resolvers';
 import { Brand, Color, Garment, GarmentCategory, GarmentImage, GarmentSubCategory, User } from '../entities';
 import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from '../config';
@@ -76,7 +76,12 @@ async function bootstrap(event: APIGatewayProxyEvent, context: Context, callback
             endpoint: '/dev/graphql',
         },
     });
-    server.createHandler()(event, context, callback);
+    server.createHandler({
+        cors: {
+            origin: '*',
+            credentials: true,
+        },
+    })(event, context, callback);
 }
 
 export function graphql(event: APIGatewayProxyEvent, context: Context, callback: Callback<APIGatewayProxyResult>) {
