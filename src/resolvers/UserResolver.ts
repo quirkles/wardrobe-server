@@ -1,11 +1,11 @@
-import { Resolver, Mutation, Arg, Query } from 'type-graphql';
 import { sign } from 'jsonwebtoken';
-import { JWT_SECRET } from '../config';
-
-import { User } from '../entities/User';
-import { CreateUserInput } from '../inputs/CreateUserInput';
-import { InjectRepository } from 'typeorm-typedi-extensions';
+import { Resolver, Mutation, Arg, Query } from 'type-graphql';
 import { Repository } from 'typeorm';
+import { InjectRepository } from 'typeorm-typedi-extensions';
+
+import config from '../../config';
+import { User } from '../entities';
+import { CreateUserInput } from '../inputs/CreateUserInput';
 import { encrypt } from '../encrypt';
 import {
     CreateUserResult,
@@ -14,8 +14,9 @@ import {
     UserNotFoundError,
     GetUserByIdResult,
 } from '../responses/userResponses';
-import { FallBackServerError } from '../responses/errorResponses';
+import { FallBackServerError, ValidationError } from '../responses/errorResponses';
 import { Service } from 'typedi';
+import { validate } from 'class-validator';
 
 @Resolver()
 @Service()
@@ -41,6 +42,10 @@ export class UserResolver {
     @Mutation(() => CreateUserResult)
     async createUser(@Arg('input') input: CreateUserInput): Promise<typeof CreateUserResult> {
         try {
+            const errors = await validate(input);
+            if (errors.length) {
+                return new ValidationError(errors);
+            }
             const existingUser = await this.userRepository.findOne({ email: input.email });
             if (existingUser) {
                 return new DuplicateUserError();
@@ -48,7 +53,7 @@ export class UserResolver {
             const user = this.userRepository.create(input);
             await user.save();
             const { email, id } = user;
-            const token = sign({ email, sub: id }, JWT_SECRET);
+            const token = sign({ email, sub: id }, config.JWT_SECRET);
             return { user, token };
         } catch (e) {
             return new FallBackServerError({ message: 'Failed to create user', reason: e.message });
@@ -60,7 +65,7 @@ export class UserResolver {
         const user = await this.userRepository.findOne({ email, password: encrypt(password) });
         if (user) {
             const { email, id } = user;
-            const token = sign({ email, sub: id }, JWT_SECRET);
+            const token = sign({ email, sub: id }, config.JWT_SECRET);
             return { user, token };
         }
         return new UserNotFoundError();

@@ -1,11 +1,11 @@
-import { v4 as uuid } from 'uuid';
-import { verify } from 'jsonwebtoken';
-import { Request, Response } from 'express';
-import { Logger } from 'pino';
-
-import { JWT_SECRET } from '../config';
-import { JwtBody } from '../auth/types';
 import { APIGatewayProxyEvent, Context as LambdaContext } from 'aws-lambda';
+import { Request, Response } from 'express';
+import { verify } from 'jsonwebtoken';
+import { Logger } from 'pino';
+import { v4 as uuid } from 'uuid';
+
+import config from '../../config';
+import { JwtBody } from '../auth/types';
 
 export interface AppContext {
     user: { id: string; email: string } | null;
@@ -35,7 +35,7 @@ export const createExpressContext = (logger: Logger) => (integrationContext: Exp
         const authHeader = req.headers.authorization || '';
         const token = authHeader.split('Bearer ')[1];
         if (token) {
-            const { email, sub } = verify(token, JWT_SECRET) as JwtBody;
+            const { email, sub } = verify(token, config.JWT_SECRET) as JwtBody;
             user = { email, id: sub };
         }
     } catch (e) {
@@ -57,7 +57,7 @@ export const createLambdaContext = (logger: Logger) => (integrationContext: Lamb
         const authHeader = event.headers.authorization || '';
         const token = authHeader.split('Bearer ')[1];
         if (token) {
-            const { email, sub } = verify(token, JWT_SECRET) as JwtBody;
+            const { email, sub } = verify(token, config.JWT_SECRET) as JwtBody;
             user = { email, id: sub };
         }
     } catch (e) {

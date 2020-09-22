@@ -1,4 +1,6 @@
+import { ValidationError as ValidatorError } from 'class-validator';
 import { Field, ObjectType, registerEnumType } from 'type-graphql';
+import { User } from '../entities';
 
 export enum ErrorSource {
     ServerError = 'ServerError',
@@ -101,5 +103,39 @@ export class UnauthorizedError implements BaseError {
     constructor({ reason, message }: ErrorProps) {
         this.reason = reason || this.reason;
         this.message = message || this.message;
+    }
+}
+
+@ObjectType()
+class ValidationErrorKeyValuePair {
+    @Field()
+    field: string;
+
+    @Field()
+    error: string;
+}
+
+@ObjectType()
+export class ValidationError implements BaseError {
+    @Field()
+    readonly responseType: string = 'ValidationError';
+
+    @Field()
+    readonly type: ErrorSource = ErrorSource.ClientError;
+
+    @Field()
+    readonly reason: string = 'Invalid input';
+
+    @Field()
+    readonly message: string = 'Could not complete action';
+
+    @Field(() => [ValidationErrorKeyValuePair])
+    errors: ValidationErrorKeyValuePair[];
+
+    constructor(errors: ValidatorError[]) {
+        this.errors = errors.map((error) => ({
+            field: error.property,
+            error: Object.values(error.constraints || {}).join(', '),
+        }));
     }
 }

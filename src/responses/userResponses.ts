@@ -1,6 +1,6 @@
 import { User } from '../entities/User';
 import { createUnionType, Field, ObjectType } from 'type-graphql';
-import { BaseError, FallBackServerError, ErrorSource } from './errorResponses';
+import {BaseError, FallBackServerError, ErrorSource, ValidationError} from './errorResponses';
 
 @ObjectType()
 export class UserNotFoundError implements BaseError {
@@ -37,7 +37,7 @@ export class UserAndToken {
 
 export const CreateUserResult = createUnionType({
     name: 'CreateUserResult',
-    types: () => [UserAndToken, DuplicateUserError, FallBackServerError] as const,
+    types: () => [UserAndToken, DuplicateUserError, FallBackServerError, ValidationError] as const,
     resolveType: (value) => {
         if ('user' in value) {
             return 'UserAndToken';

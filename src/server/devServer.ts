@@ -2,15 +2,15 @@ import 'reflect-metadata';
 import { ConnectionOptions, createConnection, useContainer } from 'typeorm';
 import { ApolloServer } from 'apollo-server';
 import { buildSchema } from 'type-graphql';
-import { join } from 'path';
 import { Container } from 'typedi';
 
+import config from '../../config';
 import { getLogger } from '../logger';
 import { authChecker } from '../auth/authChecker';
 import resolvers from './resolvers';
 import { createExpressContext } from './appContext';
 
-import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from '../config';
+const { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } = config;
 
 const ormConfig: ConnectionOptions = {
     type: 'postgres',
@@ -28,8 +28,6 @@ const ormConfig: ConnectionOptions = {
 
 const logger = getLogger();
 
-logger.info(ormConfig);
-
 const context = createExpressContext(logger);
 
 async function main(): Promise<void> {
@@ -40,11 +38,7 @@ async function main(): Promise<void> {
             authChecker,
             resolvers: resolvers as never,
             container: Container,
-            // emitSchemaFile: {
-            //     path: join(__dirname, '../', '/schema.gql'),
-            //     commentDescriptions: true,
-            //     sortedSchema: false,
-            // },
+            validate: false,
         });
         const server = new ApolloServer({
             schema,

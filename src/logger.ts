@@ -2,8 +2,10 @@ import pino, { Logger } from 'pino';
 import * as os from 'os';
 import { join } from 'path';
 
+import config from '../config';
+
 let logOutput: string | number = 1;
-if (process.env.APP_ENV && process.env.APP_ENV === 'local') {
+if (config.LOG_TO_FILE) {
     logOutput = join(__dirname, '..', 'logs', `server.log`);
 }
 

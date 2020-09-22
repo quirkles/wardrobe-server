@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const path = require('path');
-const fs = require('fs');
-const dotenv = require('dotenv');
+const config = require('./config');
+
+console.log('config') //eslint-disable-line
+console.log(config) //eslint-disable-line
 
 const envs = ['dev', 'local'];
 
 module.exports = envs.map((env) => {
-    const configFilePath = path.resolve(process.cwd(), `.${env}.env`);
-    const configFromEnvFile = dotenv.parse(fs.readFileSync(configFilePath));
-    const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = configFromEnvFile;
+    const { DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = config;
     return {
         name: env,
         type: 'postgres',

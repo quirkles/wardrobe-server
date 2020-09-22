@@ -1,12 +1,11 @@
 import 'reflect-metadata';
 import { Context, APIGatewayProxyEvent, Callback, APIGatewayProxyResult } from 'aws-lambda';
 import { ApolloServer } from 'apollo-server-lambda';
-
 import * as TypeORM from 'typeorm';
 import * as TypeGraphQL from 'type-graphql';
-
 import { Container } from 'typedi';
 
+import config from '../../config';
 import {
     BrandResolver,
     CategoryResolver,
@@ -17,11 +16,11 @@ import {
     HealthCheckResolver,
 } from '../resolvers';
 import { Brand, Color, Garment, GarmentCategory, GarmentImage, GarmentSubCategory, User } from '../entities';
-import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from '../config';
 import { authChecker } from '../auth/authChecker';
 import { getLogger } from '../logger';
 import { createLambdaContext } from './appContext';
 
+const { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } = config;
 const ormConfig: TypeORM.ConnectionOptions = {
     type: 'postgres',
     host: DB_HOST,
