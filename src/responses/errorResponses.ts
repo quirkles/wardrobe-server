@@ -111,8 +111,11 @@ class ValidationErrorKeyValuePair {
     @Field()
     field: string;
 
-    @Field()
-    error: string;
+    @Field(() => [String])
+    constraints: string[];
+
+    @Field(() => [String])
+    errors: string[];
 }
 
 @ObjectType()
@@ -133,9 +136,12 @@ export class ValidationError implements BaseError {
     errors: ValidationErrorKeyValuePair[];
 
     constructor(errors: ValidatorError[]) {
+        console.log('errors') //eslint-disable-line
+        console.log(errors) //eslint-disable-line
         this.errors = errors.map((error) => ({
             field: error.property,
-            error: Object.values(error.constraints || {}).join(', '),
+            errors: Object.values(error.constraints || {}),
+            constraints: Object.keys(error.constraints || {}),
         }));
     }
 }
