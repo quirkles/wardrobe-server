@@ -14,11 +14,9 @@ export class CreateUserInput implements Partial<User> {
     @IsNotEmpty()
     password: string;
 
-    @MinLength(4)
     @Field({ nullable: true })
     firstName?: string;
 
-    @MinLength(4)
     @Field({ nullable: true })
     lastName?: string;
 }
